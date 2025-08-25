@@ -29,7 +29,10 @@ const float EPSILON = 0.00001;
 
 
 //----------------------------------------
-// struct Roots - структура корней уравнения
+// struct Equation_data - структура коэффицентов и корней уравнения + количество корней
+// a первый коэффицент уравнения a
+// b второй коэффицент уравнения b
+// c третий коэффицент уравнения c
 // x1 первый корень уравнения
 // x2 второй корень уравнения
 // num_roots количество корней
@@ -37,25 +40,13 @@ const float EPSILON = 0.00001;
 
 typedef struct
 {
-    double x1;
-    double x2;
-    int num_roots;
-} Roots;
-
-
-//----------------------------------------
-// struct Coefficients - структура корней уравнения
-// a первый коэффицент уравнения a
-// b второй коэффицент уравнения b
-// c третий коэффицент уравнения c
-//----------------------------------------
-
-typedef struct
-{
     double a;
     double b;
     double c;
-} Coefficients;
+    double x1;
+    double x2;
+    int num_roots;
+} Equation_data;
 
 
 //----------------------------------------
@@ -78,37 +69,37 @@ int check_epsilon_neighborhood(double number, double program_number)
 
 
 //----------------------------------------
-//@param [in] Coefficients структура коэффицентов a,b,c
+//@param [in] Equation_data - структура коэффицентов и корней уравнения + количество корней
 //[out] вывод вида уравнения на экран пользователя
 //----------------------------------------
 
-void print_equation(Coefficients coefficients)
+void print_equation(Equation_data equation_data)
 {
-    printf("Уравнение: %.4fx^2", coefficients.a);
-    if (coefficients.b >= 0) {
-        printf(" + %.4fx", coefficients.b);
+    printf("Уравнение: %.4fx^2", equation_data.a);
+    if (equation_data.b >= 0) {
+        printf(" + %.4fx", equation_data.b);
     }
     else
     {
-        printf(" - %.4fx", -(coefficients.b));
+        printf(" - %.4fx", -(equation_data.b));
     }
 
-    if (coefficients.c >= 0) {
-        printf(" + %.4f = 0\n", coefficients.c);
+    if (equation_data.c >= 0) {
+        printf(" + %.4f = 0\n", equation_data.c);
     }
     else {
-        printf(" - %.4f = 0\n", -(coefficients.c));
+        printf(" - %.4f = 0\n", -(equation_data.c));
     }
 }
 
 
 //----------------------------------------
-//@param [out] Coefficients структура коэффицентов a,b,c
+//@param [out] Equation_data - структура коэффицентов и корней уравнения + количество корней
 //----------------------------------------
 
- Coefficients input()
+ Equation_data input()
  {
-    Coefficients coefficients;
+    Equation_data equation_data;
     double a = NAN;
     double b = NAN;
     double c = NAN;
@@ -120,81 +111,80 @@ void print_equation(Coefficients coefficients)
     scanf("%lf", &b);
     scanf("%lf", &c);
 
-    coefficients.a=a;
-    coefficients.b=b;
-    coefficients.c=c;
+    equation_data.a=a;
+    equation_data.b=b;
+    equation_data.c=c;
 
     printf("\nВы ввели:\n");
-    printf("Первый коэфицент a: %.4f\n", coefficients.a);
-    printf("Второй коэфицент b: %.4f\n", coefficients.b);
-    printf("Третий коэфицент c: %.4f\n", coefficients.c);
+    printf("Первый коэфицент a: %.4f\n", equation_data.a);
+    printf("Второй коэфицент b: %.4f\n", equation_data.b);
+    printf("Третий коэфицент c: %.4f\n", equation_data.c);
     //  print_equation(coefficients);  //
 
-    return coefficients;
+    return equation_data;
  }
 
 
 //----------------------------------------
-//@param [in] Coefficients структура коэффицентов a,b,c
+//@param [in] Equation_data - структура коэффицентов и корней уравнения + количество корней
 //@param [out] discriminant вывод дискриминанта уравнения
 //----------------------------------------
 
-double calc_discriminant(Coefficients coefficients)
+double calc_discriminant(Equation_data equation_data)
 {
-    return coefficients.b * coefficients.b - 4 * coefficients.a * coefficients.c;
+    return equation_data.b * equation_data.b - 4 * equation_data.a * equation_data.c;
 }
 
 
 //----------------------------------------
-//@param [in] Coefficients структура коэффицентов a,b,c
-//@param [out] Roots структура значений уравнения x1,x2 и количества решений num_roots
+//@param [in] Equation_data - структура коэффицентов и корней уравнения + количество корней
+//@param [out] Equation_data - структура коэффицентов и корней уравнения + количество корней
 //----------------------------------------
 
-Roots solve_quadratic_equation(Coefficients coefficients)
+Equation_data solve_quadratic_equation(Equation_data equation_data)
 {
-    Roots roots;
 
-    double discriminant = calc_discriminant(coefficients);
+    double discriminant = calc_discriminant(equation_data);
 
-    if (check_epsilon_neighborhood(coefficients.a, 0)==1)
+    if (check_epsilon_neighborhood(equation_data.a, 0)==1)
     {
 
         if (discriminant > 0+EPSILON) {
-            roots.num_roots = 2;
-            roots.x1 = (-coefficients.b + sqrt(discriminant)) / (2 * coefficients.a);
-            roots.x2 = (-coefficients.b - sqrt(discriminant)) / (2 * coefficients.a);
+            equation_data.num_roots = 2;
+            equation_data.x1 = (-equation_data.b + sqrt(discriminant)) / (2 * equation_data.a);
+            equation_data.x2 = (-equation_data.b - sqrt(discriminant)) / (2 * equation_data.a);
         }
         else if (check_epsilon_neighborhood(discriminant, 0)==0) {
-            roots.num_roots = 1;
-            roots.x1 = roots.x2 = -coefficients.b / (2 * coefficients.a);
+            equation_data.num_roots = 1;
+            equation_data.x1 = equation_data.x2 = -equation_data.b / (2 * equation_data.a);
         }
         else {
-            roots.num_roots = 0;
-            roots.x1 = roots.x2 = 0;
+            equation_data.num_roots = 0;
+            equation_data.x1 = equation_data.x2 = 0;
         }
 
     }
 
-    else if (check_epsilon_neighborhood(coefficients.a, 0)==0)
+    else if (check_epsilon_neighborhood(equation_data.a, 0)==0)
     {
-        if (check_epsilon_neighborhood(coefficients.b, 0)==0) {
-            if (check_epsilon_neighborhood(coefficients.c, 0)==0) {
-                roots.num_roots = -1;
-                roots.x1 = roots.x2 = 0;
+        if (check_epsilon_neighborhood(equation_data.b, 0)==0) {
+            if (check_epsilon_neighborhood(equation_data.c, 0)==0) {
+                equation_data.num_roots = -1;
+                equation_data.x1 = equation_data.x2 = 0;
             }
             else {
-                roots.num_roots = 0;
-                roots.x1 = roots.x2 = 0;
+                equation_data.num_roots = 0;
+                equation_data.x1 = equation_data.x2 = 0;
             }
             }
         else {
-            roots.num_roots = 1;
-            roots.x1 = -coefficients.c / coefficients.b;
-            roots.x2 = roots.x1;
+            equation_data.num_roots = 1;
+            equation_data.x1 = -equation_data.c / equation_data.b;
+            equation_data.x2 = equation_data.x1;
         }
     }
 
-    return roots;
+    return equation_data;
 }
 
 
@@ -210,16 +200,15 @@ Roots solve_quadratic_equation(Coefficients coefficients)
 
 int run_one_test(double a, double b, double c, double x1_specified , double x2_specified, int number_of_solutions)
 {
-    Coefficients coefficients;
-    Roots roots;
+    Equation_data equation_data;
 
-    coefficients.a=a;
-    coefficients.b=b;
-    coefficients.c=c;
+    equation_data.a=a;
+    equation_data.b=b;
+    equation_data.c=c;
 
-    roots = solve_quadratic_equation(coefficients);
+    equation_data = solve_quadratic_equation(equation_data);
 
-    if ((check_epsilon_neighborhood(roots.x1,x1_specified)==0)  && (check_epsilon_neighborhood(roots.x2,x2_specified)==0) && (number_of_solutions == roots.num_roots)){
+    if ((check_epsilon_neighborhood(equation_data.x1,x1_specified)==0)  && (check_epsilon_neighborhood(equation_data.x2,x2_specified)==0) && (number_of_solutions == equation_data.num_roots)){
         return 1;
     }
     else{
@@ -234,7 +223,7 @@ int run_one_test(double a, double b, double c, double x1_specified , double x2_s
 
 int run_test()
 {
-    float tests_array[AMOUNT_OF_TESTS][N] = {
+    Equation_data tests[AMOUNT_OF_TESTS] = {
           {3,5,-2,0.3333333,-2,2},
           {-2,8,6,-0.645751,4.64575,2},
           {4,-4,1,0.5,0.5,1},
@@ -246,7 +235,7 @@ int run_test()
     int not_failed = 0;
     for (int i = 0; i < AMOUNT_OF_TESTS; i++)
     {
-        not_failed += run_one_test(tests_array[i][0], tests_array[i][1], tests_array[i][2], tests_array[i][3], tests_array[i][4], tests_array[i][5]);
+        not_failed += run_one_test(tests[i].a, tests[i].b, tests[i].c, tests[i].x1, tests[i].x2, tests[i].num_roots);
     }
 
     return not_failed;
@@ -267,16 +256,16 @@ void testing_program()
 
 
 //----------------------------------------
-//@param [in]  roots  корни уравнения
+//@param [in]  Equation_data - структура коэффицентов и корней уравнения + количество корней
 //@param [in]  x1 первый корень уравнения
 //@param [in]  x2 второй корень уравнения
 //----------------------------------------
 
-void print_results(Roots roots)
+void print_results(Equation_data equation_data)
 {
     printf("\n==== РЕЗУЛЬТАТЫ ====\n");
 
-    switch (roots.num_roots) {
+    switch (equation_data.num_roots) {
         case -1:
             printf("Уравнение имеет бесконечно много корней\n");
             break;
@@ -285,12 +274,12 @@ void print_results(Roots roots)
             break;
         case 1:
             printf("Уравнение имеет один корень:\n");
-            printf("x = %.12f\n", roots.x1);
+            printf("x = %.12f\n", equation_data.x1);
             break;
         case 2:
             printf("Уравнение имеет два корня:\n");
-            printf("x1 = %.12f\n", roots.x1);
-            printf("x2 = %.12f\n", roots.x2);
+            printf("x1 = %.12f\n", equation_data.x1);
+            printf("x2 = %.12f\n", equation_data.x2);
             break;
     }
 }
@@ -299,15 +288,14 @@ void print_results(Roots roots)
 
 int main() {
 
-    Coefficients coefficients;
-    Roots roots;
+    Equation_data equation_data;
 
     testing_program();
 
-    coefficients = input();
+    equation_data = input();
 
-    roots = solve_quadratic_equation(coefficients);
-    print_results(roots);
+    equation_data = solve_quadratic_equation(equation_data);
+    print_results(equation_data);
 
     return 0;
 }
