@@ -25,7 +25,7 @@ const int N = 6;
 //const float EPSILON - константа эпсилон окрестности вычислений
 //----------------------------------------
 
-const float EPSILON = 0.0001;
+const float EPSILON = 0.00001;
 
 
 //----------------------------------------
@@ -35,7 +35,8 @@ const float EPSILON = 0.0001;
 // num_roots количество корней
 //----------------------------------------
 
-typedef struct {
+typedef struct
+{
     double x1;
     double x2;
     int num_roots;
@@ -49,7 +50,8 @@ typedef struct {
 // c третий коэффицент уравнения c
 //----------------------------------------
 
-typedef struct {
+typedef struct
+{
     double a;
     double b;
     double c;
@@ -57,20 +59,44 @@ typedef struct {
 
 
 //----------------------------------------
+//@param [in] double number число, для которого проверяется эпсилон окрестность
+//@param [in] double program_number число, вокруг которого проверяется эпсилон окрестность
+//[out] int число (1 - если True и 0 - если False)
+//----------------------------------------
+
+int check_epsilon_neighborhood(double number, double program_number)
+{
+    if (!((number<program_number+EPSILON) && (number>program_number-EPSILON)))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+//----------------------------------------
 //@param [in] Coefficients структура коэффицентов a,b,c
 //[out] вывод вида уравнения на экран пользователя
 //----------------------------------------
 
-void print_equation(Coefficients coefficients) {
+void print_equation(Coefficients coefficients)
+{
     printf("Уравнение: %.4fx^2", coefficients.a);
     if (coefficients.b >= 0) {
         printf(" + %.4fx", coefficients.b);
-    } else {
+    }
+    else
+    {
         printf(" - %.4fx", -(coefficients.b));
     }
+
     if (coefficients.c >= 0) {
         printf(" + %.4f = 0\n", coefficients.c);
-    } else {
+    }
+    else {
         printf(" - %.4f = 0\n", -(coefficients.c));
     }
 }
@@ -80,7 +106,8 @@ void print_equation(Coefficients coefficients) {
 //@param [out] Coefficients структура коэффицентов a,b,c
 //----------------------------------------
 
- Coefficients input(){
+ Coefficients input()
+ {
     Coefficients coefficients;
     double a = NAN;
     double b = NAN;
@@ -108,14 +135,13 @@ void print_equation(Coefficients coefficients) {
 
 
 //----------------------------------------
-//@param [in] a  кожффицент a
-//@param [in] b  коэффицент b
-//@param [in] c  коэффицент c
+//@param [in] Coefficients структура коэффицентов a,b,c
 //@param [out] discriminant вывод дискриминанта уравнения
 //----------------------------------------
 
-double calc_discriminant(double a, double b, double c) {
-    return b * b - 4 * a * c;
+double calc_discriminant(Coefficients coefficients)
+{
+    return coefficients.b * coefficients.b - 4 * coefficients.a * coefficients.c;
 }
 
 
@@ -124,32 +150,35 @@ double calc_discriminant(double a, double b, double c) {
 //@param [out] Roots структура значений уравнения x1,x2 и количества решений num_roots
 //----------------------------------------
 
-Roots solve_quadratic_equation(Coefficients coefficients) {
+Roots solve_quadratic_equation(Coefficients coefficients)
+{
     Roots roots;
 
-    double discriminant = calc_discriminant(coefficients.a, coefficients.b, coefficients.c);
+    double discriminant = calc_discriminant(coefficients);
 
-    if (!((coefficients.a<=0+EPSILON) && (coefficients.a>=0-EPSILON)))
+    if (check_epsilon_neighborhood(coefficients.a, 0)==1)
     {
 
         if (discriminant > 0+EPSILON) {
             roots.num_roots = 2;
             roots.x1 = (-coefficients.b + sqrt(discriminant)) / (2 * coefficients.a);
             roots.x2 = (-coefficients.b - sqrt(discriminant)) / (2 * coefficients.a);
-        } else if ((discriminant <= 0+EPSILON) && (discriminant >= 0-EPSILON)) {
+        }
+        else if (check_epsilon_neighborhood(discriminant, 0)==0) {
             roots.num_roots = 1;
             roots.x1 = roots.x2 = -coefficients.b / (2 * coefficients.a);
-        } else {
+        }
+        else {
             roots.num_roots = 0;
             roots.x1 = roots.x2 = 0;
         }
 
     }
 
-    else if ((coefficients.a<=0+EPSILON) && (coefficients.a>=0-EPSILON))
+    else if (check_epsilon_neighborhood(coefficients.a, 0)==0)
     {
-        if ((coefficients.b<=0+EPSILON) && (coefficients.b>=0-EPSILON)) {
-            if ((coefficients.c<=0+EPSILON) && (coefficients.c>=0-EPSILON)) {
+        if (check_epsilon_neighborhood(coefficients.b, 0)==0) {
+            if (check_epsilon_neighborhood(coefficients.c, 0)==0) {
                 roots.num_roots = -1;
                 roots.x1 = roots.x2 = 0;
             }
@@ -190,7 +219,7 @@ int run_one_test(double a, double b, double c, double x1_specified , double x2_s
 
     roots = solve_quadratic_equation(coefficients);
 
-    if ((x1_specified+EPSILON >= roots.x1) && (x1_specified-EPSILON <= roots.x1) && (x2_specified+EPSILON >= roots.x2) && (x2_specified-EPSILON <= roots.x2) && (number_of_solutions == roots.num_roots)){
+    if ((check_epsilon_neighborhood(roots.x1,x1_specified)==0)  && (check_epsilon_neighborhood(roots.x2,x2_specified)==0) && (number_of_solutions == roots.num_roots)){
         return 1;
     }
     else{
@@ -206,8 +235,8 @@ int run_one_test(double a, double b, double c, double x1_specified , double x2_s
 int run_test()
 {
     float tests_array[AMOUNT_OF_TESTS][N] = {
-          {3,5,-2,0.3334,-2,2},
-          {-2,8,6,-0.6458,4.6458,2},
+          {3,5,-2,0.3333333,-2,2},
+          {-2,8,6,-0.645751,4.64575,2},
           {4,-4,1,0.5,0.5,1},
           {7,2,9,0,0,0},
           {0,0,0,0,0,-1},
@@ -243,7 +272,8 @@ void testing_program()
 //@param [in]  x2 второй корень уравнения
 //----------------------------------------
 
-void print_results(Roots roots) {
+void print_results(Roots roots)
+{
     printf("\n==== РЕЗУЛЬТАТЫ ====\n");
 
     switch (roots.num_roots) {
@@ -255,12 +285,12 @@ void print_results(Roots roots) {
             break;
         case 1:
             printf("Уравнение имеет один корень:\n");
-            printf("x = %.4f\n", roots.x1);
+            printf("x = %.12f\n", roots.x1);
             break;
         case 2:
             printf("Уравнение имеет два корня:\n");
-            printf("x1 = %.4f\n", roots.x1);
-            printf("x2 = %.4f\n", roots.x2);
+            printf("x1 = %.12f\n", roots.x1);
+            printf("x2 = %.12f\n", roots.x2);
             break;
     }
 }
