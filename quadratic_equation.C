@@ -2,16 +2,16 @@
 //Решение уравнений типа ax^2 + bx + c = 0
 //----------------------------------------
 
-
 #include <stdio.h>
 #include <math.h>
 #include <TXLib.h>
+
 
 //----------------------------------------
 //const int Sum_of_tests - размер массива тестовых примеров
 //----------------------------------------
 
-const int Sum_of_tests = 6;
+const int AMOUNT_OF_TESTS = 6;
 
 
 //----------------------------------------
@@ -22,10 +22,10 @@ const int N = 6;
 
 
 //----------------------------------------
-//const float Epsilon - константа эпсилон окрестности вычислений
+//const float EPSILON - константа эпсилон окрестности вычислений
 //----------------------------------------
 
-const float Epsilon = 0.0001;
+const float EPSILON = 0.0001;
 
 
 //----------------------------------------
@@ -58,7 +58,7 @@ typedef struct {
 
 //----------------------------------------
 //@param [in] Coefficients структура коэффицентов a,b,c
-//@param [out] вывод вида уравнения на экран пользователя
+//[out] вывод вида уравнения на экран пользователя
 //----------------------------------------
 
 void print_equation(Coefficients coefficients) {
@@ -101,7 +101,7 @@ void print_equation(Coefficients coefficients) {
     printf("Первый коэфицент a: %.4f\n", coefficients.a);
     printf("Второй коэфицент b: %.4f\n", coefficients.b);
     printf("Третий коэфицент c: %.4f\n", coefficients.c);
-    print_equation(coefficients);
+    //  print_equation(coefficients);  //
 
     return coefficients;
  }
@@ -129,14 +129,14 @@ Roots solve_quadratic_equation(Coefficients coefficients) {
 
     double discriminant = calc_discriminant(coefficients.a, coefficients.b, coefficients.c);
 
-    if (!((coefficients.a<=0+Epsilon) && (coefficients.a>=0-Epsilon)))
+    if (!((coefficients.a<=0+EPSILON) && (coefficients.a>=0-EPSILON)))
     {
 
-        if (discriminant > 0+Epsilon) {
+        if (discriminant > 0+EPSILON) {
             roots.num_roots = 2;
             roots.x1 = (-coefficients.b + sqrt(discriminant)) / (2 * coefficients.a);
             roots.x2 = (-coefficients.b - sqrt(discriminant)) / (2 * coefficients.a);
-        } else if ((discriminant <= 0+Epsilon) && (discriminant >= 0-Epsilon)) {
+        } else if ((discriminant <= 0+EPSILON) && (discriminant >= 0-EPSILON)) {
             roots.num_roots = 1;
             roots.x1 = roots.x2 = -coefficients.b / (2 * coefficients.a);
         } else {
@@ -146,10 +146,10 @@ Roots solve_quadratic_equation(Coefficients coefficients) {
 
     }
 
-    else if ((coefficients.a<=0+Epsilon) && (coefficients.a>=0-Epsilon))
+    else if ((coefficients.a<=0+EPSILON) && (coefficients.a>=0-EPSILON))
     {
-        if ((coefficients.b<=0+Epsilon) && (coefficients.b>=0-Epsilon)) {
-            if ((coefficients.c<=0+Epsilon) && (coefficients.c>=0-Epsilon)) {
+        if ((coefficients.b<=0+EPSILON) && (coefficients.b>=0-EPSILON)) {
+            if ((coefficients.c<=0+EPSILON) && (coefficients.c>=0-EPSILON)) {
                 roots.num_roots = -1;
                 roots.x1 = roots.x2 = 0;
             }
@@ -179,7 +179,7 @@ Roots solve_quadratic_equation(Coefficients coefficients) {
 //@param [out] 1, если тестовые корни совпадают с настоящим, иначе 0
 //----------------------------------------
 
-int One_Test(double a, double b, double c, double x1_specified , double x2_specified, int number_of_solutions)
+int run_one_test(double a, double b, double c, double x1_specified , double x2_specified, int number_of_solutions)
 {
     Coefficients coefficients;
     Roots roots;
@@ -190,7 +190,7 @@ int One_Test(double a, double b, double c, double x1_specified , double x2_speci
 
     roots = solve_quadratic_equation(coefficients);
 
-    if ((x1_specified+Epsilon >= roots.x1) && (x1_specified-Epsilon <= roots.x1) && (x2_specified+Epsilon >= roots.x2) && (x2_specified-Epsilon <= roots.x2) && (number_of_solutions == roots.num_roots)){
+    if ((x1_specified+EPSILON >= roots.x1) && (x1_specified-EPSILON <= roots.x1) && (x2_specified+EPSILON >= roots.x2) && (x2_specified-EPSILON <= roots.x2) && (number_of_solutions == roots.num_roots)){
         return 1;
     }
     else{
@@ -203,9 +203,9 @@ int One_Test(double a, double b, double c, double x1_specified , double x2_speci
 //@param [out] int not_failed количество верно пройденных тестов
 //----------------------------------------
 
-int RunTest()
+int run_test()
 {
-    float tests_array[Sum_of_tests][N] = {
+    float tests_array[AMOUNT_OF_TESTS][N] = {
           {3,5,-2,0.3334,-2,2},
           {-2,8,6,-0.6458,4.6458,2},
           {4,-4,1,0.5,0.5,1},
@@ -215,12 +215,25 @@ int RunTest()
     };
 
     int not_failed = 0;
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < AMOUNT_OF_TESTS; i++)
     {
-        not_failed += One_Test(tests_array[i][0], tests_array[i][1], tests_array[i][2], tests_array[i][3], tests_array[i][4], tests_array[i][5]);
+        not_failed += run_one_test(tests_array[i][0], tests_array[i][1], tests_array[i][2], tests_array[i][3], tests_array[i][4], tests_array[i][5]);
     }
 
     return not_failed;
+}
+
+
+//----------------------------------------
+//[out] количество верно пройденных тестов
+//----------------------------------------
+
+void testing_program()
+{
+    int count_tests = run_test();
+
+    printf("ПРОЙДЕНО ТЕСТОВ: %d", count_tests);
+    printf(" ИЗ %d\n", AMOUNT_OF_TESTS, "\n");
 }
 
 
@@ -255,16 +268,11 @@ void print_results(Roots roots) {
 
 
 int main() {
+
     Coefficients coefficients;
     Roots roots;
 
-    int count_tests = NAN;
-
-    count_tests = RunTest();
-
-    printf("ПРОЙДЕНО ТЕСТОВ: %d", count_tests);
-    printf(" ИЗ %d\n", Sum_of_tests, "\n");
-
+    testing_program();
 
     coefficients = input();
 
